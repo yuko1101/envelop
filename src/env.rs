@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
 pub struct Env {
+    #[serde(default)]
     pub variables: HashMap<String, EnvVariableOperation>,
+    #[serde(default)]
     pub args: Vec<String>,
     pub cwd: Option<String>,
 }
