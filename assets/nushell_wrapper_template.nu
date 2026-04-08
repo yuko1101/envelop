@@ -7,10 +7,8 @@ def --wrapped main [...original_args] {
   if $envelop.cwd != null { cd $envelop.cwd }
   let $envvars = $envelop.variables | items { |k, v|
     let v = $envelop.variables | get $k
-    let prefix = if $v.prefix != null { $v.prefix + $v.separator } else { null }
-    let value = if $v.value != null { $v.value } else { $env | get --optional $k | if $in == '' { null } else { $in } }
-    let suffix = if $v.suffix != null { $v.separator + $v.suffix } else { null }
-    [$k, ([$prefix $value $suffix] | where $it != null | str join $v.separator)]
+    let value = $v.value | default { $env | get --optional $k | if $in == '' { null } else { $in } }
+    [$k, ([$v.prefix $value $v.suffix] | where $it != null | str join $v.separator)]
   } | into record
 
   with-env $envvars {
