@@ -8,7 +8,7 @@ def --wrapped main [...original_args] {
   let $envvars = $envelop.variables | items { |k, v|
     let v = $envelop.variables | get $k
     let prefix = if $v.prefix != null { $v.prefix + $v.separator } else { null }
-    let value = if $v.value != null { $v.value } else { $env | get --optional $k }
+    let value = if $v.value != null { $v.value } else { $env | get --optional $k | if $in == '' { null } else { $in } }
     let suffix = if $v.suffix != null { $v.separator + $v.suffix } else { null }
     [$k, ([$prefix $value $suffix] | where $it != null | str join $v.separator)]
   } | into record
