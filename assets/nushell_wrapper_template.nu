@@ -7,7 +7,16 @@ def --wrapped main [...original_args] {
   if $envelop.cwd != null { cd $envelop.cwd }
   let $envvars = $envelop.variables | items { |k, v|
     let v = $envelop.variables | get $k
-    let value = $v.value | default { $env | get --optional $k | if $in == '' { null } else { $in } }
+    let value = $v.value | default {
+      mut original = $env | get -o $k
+      if $original != null {
+        let to_string = $env.ENV_CONVERSIONS | get -o $k | get -o to_string
+        if $to_string != null {
+          $original = do $to_string $original
+        }
+      }
+      $original | default -e null
+    }
     [$k, ([$v.prefix $value $v.suffix] | where $it != null | str join $v.separator)]
   } | into record
 
